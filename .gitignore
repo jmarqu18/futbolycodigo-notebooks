@@ -17,7 +17,7 @@ Thumbs.db
 
 # Data (heavy files)
 data/*.csv
-data/*.parquet
+data/**/*.parquet
 !data/.gitkeep
 
 # uv
