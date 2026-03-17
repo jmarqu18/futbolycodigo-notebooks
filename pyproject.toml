@@ -1,0 +1,43 @@
+[project]
+name = "futbolycodigo"
+version = "0.1.0"
+description = "Competencias reales para scouts y analistas de fútbol: problemas profesionales, técnicas de la industria, código Python funcional, validación académica."
+readme = "README.md"
+license = { file = "LICENSE" }
+authors = [
+    { name = "Juanje Marquez", email = "juanje.mn@gmail.com" }
+]
+requires-python = ">=3.13"
+dependencies = [
+    "mplsoccer>=1.4.0",
+    "statsbombpy>=1.13.0",
+    "pandas>=2.2.0",
+    "matplotlib>=3.9.0",
+    "scikit-learn>=1.5.0",
+    "networkx>=3.3",
+    "jupyter>=1.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "ruff>=0.5.0",
+    "pytest>=8.0.0",
+]
+
+[build-system]
+requires = ["hatchling>=1.0.0"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/futbolycodigo"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "notebooks/**",
+    "LICENSE",
+    "README.md",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py313"
