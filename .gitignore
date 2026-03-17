@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+*.egg-info/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Data (heavy files)
+data/*.csv
+data/*.parquet
+!data/.gitkeep
+
+# uv
+uv.lock
+
+# IA
+.claude/
+.agents/
