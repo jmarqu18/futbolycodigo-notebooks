@@ -1,0 +1,9 @@
+# requirements.txt — Semana 01: Cómo leer un mapa de calor sin engañarte
+# Python 3.10+
+
+numpy>=1.24
+pandas>=2.0
+matplotlib>=3.7
+mplsoccer>=1.4
+statsbombpy>=1.11
+pyarrow>=17.0
