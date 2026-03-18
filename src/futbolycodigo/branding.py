@@ -32,7 +32,7 @@ def apply_style() -> None:
         "ytick.color":       COLORS["text"],
         "font.family":       "sans-serif",
         "font.size":         11,
-        "figure.dpi":        150,
+        "figure.dpi":        100,
         "savefig.dpi":       200,
         "savefig.bbox":      "tight",
     })

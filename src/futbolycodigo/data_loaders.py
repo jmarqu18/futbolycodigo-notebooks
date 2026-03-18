@@ -5,7 +5,8 @@ from pathlib import Path
 import pandas as pd
 from statsbombpy import sb
 
-_CACHE_DIR = Path("data/.cache")
+_PROJECT_ROOT = Path(__file__).parent.parent.parent
+_CACHE_DIR = _PROJECT_ROOT / "data" / ".cache"
 
 
 def get_match_events(

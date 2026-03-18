@@ -76,7 +76,7 @@ def test_apply_style_sets_font_size_to_11():
 
 def test_apply_style_sets_figure_dpi():
     apply_style()
-    assert plt.rcParams["figure.dpi"] == 150
+    assert plt.rcParams["figure.dpi"] == 100
 
 
 # ---------------------------------------------------------------------------
