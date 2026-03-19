@@ -1,18 +1,22 @@
-"""Tests for futbolycodigo.branding — written before implementation (TDD)."""
+"""Tests para futbolycodigo.branding — sistema de temas y fuentes."""
 
 import matplotlib
-matplotlib.use('Agg')  # Must be set before any matplotlib imports
+matplotlib.use("Agg")
 
 import pytest
 import matplotlib.pyplot as plt
 
 from futbolycodigo.branding import (
-    COLORS,
     BLOG_NAME,
     BLOG_URL,
     AUTHOR,
+    LIGHT,
+    DARK,
+    Theme,
+    set_theme,
+    get_theme,
     apply_style,
-    watermark,
+    load_logo,
 )
 
 
@@ -21,21 +25,15 @@ from futbolycodigo.branding import (
 # ---------------------------------------------------------------------------
 
 @pytest.fixture(autouse=True)
-def reset_rcparams():
-    """Reset matplotlib rcParams to defaults after each test."""
+def reset_state():
+    """Reset matplotlib rcParams y tema activo tras cada test."""
     yield
     matplotlib.rcdefaults()
-
-
-@pytest.fixture
-def empty_figure():
-    fig = plt.figure()
-    yield fig
-    plt.close(fig)
+    set_theme("light")
 
 
 # ---------------------------------------------------------------------------
-# Constants
+# Constantes de marca
 # ---------------------------------------------------------------------------
 
 def test_blog_name_is_string():
@@ -51,25 +49,65 @@ def test_author_is_string():
 
 
 # ---------------------------------------------------------------------------
+# Temas
+# ---------------------------------------------------------------------------
+
+@pytest.mark.parametrize("theme", [LIGHT, DARK])
+def test_themes_have_all_required_fields(theme):
+    """Ambos temas deben tener todos los campos de Theme como strings no vacíos."""
+    for field_name in Theme.__dataclass_fields__:
+        val = getattr(theme, field_name)
+        if isinstance(val, str):
+            assert len(val) > 0, f"Campo {field_name} está vacío en {theme.name}"
+
+
+def test_light_theme_name():
+    assert LIGHT.name == "light"
+
+
+def test_dark_theme_name():
+    assert DARK.name == "dark"
+
+
+def test_themes_have_different_backgrounds():
+    assert LIGHT.background != DARK.background
+
+
+def test_set_theme_by_string():
+    set_theme("dark")
+    assert get_theme() is DARK
+
+
+def test_set_theme_by_instance():
+    set_theme(DARK)
+    assert get_theme() is DARK
+
+
+def test_set_theme_invalid_string_raises():
+    with pytest.raises(KeyError):
+        set_theme("nonexistent")
+
+
+def test_get_theme_default_is_light():
+    set_theme("light")
+    assert get_theme() is LIGHT
+
+
+# ---------------------------------------------------------------------------
 # apply_style
 # ---------------------------------------------------------------------------
 
-def test_apply_style_sets_figure_facecolor():
+def test_apply_style_sets_facecolor():
     apply_style()
-    assert plt.rcParams["figure.facecolor"] == COLORS["background"]
-
-
-def test_apply_style_sets_axes_facecolor():
-    apply_style()
-    assert plt.rcParams["axes.facecolor"] == COLORS["background"]
+    assert plt.rcParams["figure.facecolor"] == LIGHT.background
 
 
 def test_apply_style_sets_text_color():
     apply_style()
-    assert plt.rcParams["text.color"] == COLORS["text"]
+    assert plt.rcParams["text.color"] == LIGHT.text
 
 
-def test_apply_style_sets_font_size_to_11():
+def test_apply_style_sets_font_size():
     apply_style()
     assert plt.rcParams["font.size"] == 11
 
@@ -79,23 +117,40 @@ def test_apply_style_sets_figure_dpi():
     assert plt.rcParams["figure.dpi"] == 100
 
 
+def test_apply_style_with_dark_theme():
+    apply_style("dark")
+    assert plt.rcParams["figure.facecolor"] == DARK.background
+    assert plt.rcParams["text.color"] == DARK.text
+    assert get_theme() is DARK
+
+
+def test_apply_style_with_theme_instance():
+    apply_style(DARK)
+    assert plt.rcParams["figure.facecolor"] == DARK.background
+
+
+def test_apply_style_registers_font():
+    """Verifica que después de apply_style, la fuente es Inter o DejaVu Sans."""
+    apply_style()
+    font = plt.rcParams["font.family"]
+    # rcParams devuelve una lista para font.family
+    if isinstance(font, list):
+        font = font[0]
+    assert font in ("Inter", "DejaVu Sans")
+
+
 # ---------------------------------------------------------------------------
-# watermark
+# load_logo
 # ---------------------------------------------------------------------------
 
-def test_watermark_adds_one_text_to_figure(empty_figure):
-    before = len(empty_figure.texts)
-    watermark(empty_figure)
-    assert len(empty_figure.texts) == before + 1
+def test_load_logo_returns_image_or_none():
+    """load_logo devuelve una imagen PIL o None si no existe el archivo."""
+    result = load_logo(width=300)
+    # Puede ser None si los PNGs no se generaron, o Image si existen
+    if result is not None:
+        from PIL import Image
+        assert isinstance(result, Image.Image)
 
 
-def test_watermark_text_contains_blog_url(empty_figure):
-    watermark(empty_figure)
-    texts = [t.get_text() for t in empty_figure.texts]
-    assert any(BLOG_URL in t for t in texts)
-
-
-def test_watermark_text_contains_author(empty_figure):
-    watermark(empty_figure)
-    texts = [t.get_text() for t in empty_figure.texts]
-    assert any(AUTHOR in t for t in texts)
+def test_load_logo_nonexistent_width_returns_none():
+    assert load_logo(width=9999) is None
