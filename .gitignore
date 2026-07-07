@@ -27,3 +27,6 @@ uv.lock
 # IA
 .claude/
 .agents/
+.kilo/
+AGENTS.md
+CLAUDE.md
